@@ -113,7 +113,7 @@ public abstract class ShaderProgram
         return location;
     }
 
-    public void SetUniform1b(String name, boolean value) { GL20.glUniform1f(GetUniformLocation(name), (value) ? 1 : 0); }
+    public void SetUniform1b(String name, boolean value) { GL20.glUniform1f(GetUniformLocation(name), (value) ? 1.0f : 0.0f); }
     public void SetUniform1i(String name, int value) { GL20.glUniform1i(GetUniformLocation(name), value); }
     public void SetUniform1f(String name, float value)
     {

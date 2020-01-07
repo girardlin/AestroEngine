@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import models.RawModel;
+import objConverter.ModelData;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL15;
@@ -28,6 +29,11 @@ public class Loader
 		StoreDataInAttributeList(2, 3, normals);
 		UnbindVAO();
 		return new RawModel(vaoID, indices.length);
+	}
+
+	public RawModel LoadToVAO(ModelData modelData)
+	{
+		return this.LoadToVAO(modelData.GetVertices(), modelData.GetTextureCoords(), modelData.GetNormals(), modelData.GetIndices());
 	}
 	
 	private int CreateVAO()

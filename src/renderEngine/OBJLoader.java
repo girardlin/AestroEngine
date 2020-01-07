@@ -1,3 +1,4 @@
+/*
 package renderEngine;
 
 import models.RawModel;
@@ -123,3 +124,4 @@ public class OBJLoader
         normalsArray[currentVertexPointer * 3 + 2] = currentNormal.z;
     }
 }
+*/

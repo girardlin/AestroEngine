@@ -10,8 +10,8 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class WindowManager
 {	
-	private static final int SCREEN_WIDTH = 1000;
-	private static final int SCREEN_HEIGHT = 1000;
+	private static final int SCREEN_WIDTH = 600;
+	private static final int SCREEN_HEIGHT = 600;
 	
 	private static long window;
 	

@@ -1,7 +1,8 @@
 package input;
 
-import entities.Camera;
+import entities.PlayerCamera;
 import org.lwjgl.BufferUtils;
+import renderEngine.MasterRenderer;
 import renderEngine.WindowManager;
 
 import java.nio.DoubleBuffer;
@@ -24,7 +25,7 @@ public class InputManager
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 
-    public void ProcessInputs(Camera camera, float deltaTime)
+    public void ProcessInputs(PlayerCamera camera, float deltaTime, MasterRenderer renderer)
     {
         //keyboard inputs
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -33,8 +34,18 @@ public class InputManager
         }
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) //forward
         {
-            camera.ProcessKeyboardInputs("FORWARD", deltaTime);
+            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) //if holding shift too
+            {
+                camera.ProcessKeyboardInputs("SPRINT_FORWARD", deltaTime);
+                renderer.IncreaseFOVY(deltaTime);
+            }
+            else
+            {
+                camera.ProcessKeyboardInputs("FORWARD", deltaTime);
+                renderer.DecreaseFOVY(deltaTime);
+            }
         }
+        else { renderer.DecreaseFOVY(deltaTime); } //fov reset
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) //backward
         {
             camera.ProcessKeyboardInputs("BACKWARD", deltaTime);
@@ -46,6 +57,10 @@ public class InputManager
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) //right strafe
         {
             camera.ProcessKeyboardInputs("STRAFE_RIGHT", deltaTime);
+        }
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) //right strafe
+        {
+            camera.ProcessKeyboardInputs("JUMP", deltaTime);
         }
 
         //mouse inputs

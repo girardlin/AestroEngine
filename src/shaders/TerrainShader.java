@@ -1,7 +1,7 @@
 package shaders;
 
 import entities.Light;
-import textures.ModelTexture;
+import textures.TerrainTexture;
 
 public class TerrainShader extends ShaderProgram
 {
@@ -27,9 +27,9 @@ public class TerrainShader extends ShaderProgram
         SetUniform3f("u_Light.color", light.GetColor());
     }
 
-    public void SetShineUniforms(ModelTexture modelTexture)
+    public void SetShineUniforms()
     {
-        SetUniform1f("u_Material.shininess", modelTexture.GetShininess());
-        SetUniform1f("u_Material.reflectivity", modelTexture.GetReflectivity());
+        SetUniform1f("u_Material.shininess", 1.0f);
+        SetUniform1f("u_Material.reflectivity", 0.0f);
     }
 }
