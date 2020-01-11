@@ -6,10 +6,14 @@ import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import entities.Entity;
 import entities.Light;
 import entities.Player;
+import guis.GuiElement;
+import guis.GuiRenderer;
+import guis.GuiTexture;
 import input.InputManager;
 import models.RawModel;
 import models.TexturedModel;
 import objConverter.OBJFileLoader;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import renderEngine.*;
 import terrains.Terrain;
@@ -28,9 +32,14 @@ public class MainGameLoop
 		final long MAIN_WINDOW = WindowManager.Create();
 		InputManager inputManager = new InputManager();
 		Loader loader = new Loader();
-		Light sun = new Light(new Vector3f(200.0f, 200.0f, 200.0f), new Vector3f(1.0f, 0.95f, 0.95f));
 		MasterRenderer renderer = new MasterRenderer();
 		Random random = new Random();
+
+		//Lights Instantiations
+		List<Light> lights = new ArrayList<Light>();
+
+		Light sun = new Light(new Vector3f(200.0f, 200.0f, 200.0f), new Vector3f(0.8f, 0.8f, 0.8f));
+		lights.add(sun);
 
 		//Terrain Instantiations
 		List<Terrain> terrains = new ArrayList<Terrain>();
@@ -52,44 +61,65 @@ public class MainGameLoop
 		//Entity instantiations
 		List<Entity> entities = new ArrayList<Entity>();
 
-		RawModel treeModel = loader.LoadToVAO(OBJFileLoader.loadOBJ("tree.obj"));
-		ModelTexture treeTexture = new ModelTexture(loader.LoadTexture("tree.png"));
+		RawModel treeModel = loader.LoadToVAO(OBJFileLoader.loadOBJ("pine.obj"));
+		ModelTexture treeTexture = new ModelTexture(loader.LoadTexture("pine.png"));
+		treeTexture.SetTransparencyBool(true);
 		TexturedModel treeTexturedModel = new TexturedModel(treeModel, treeTexture);
-
-		RawModel grassModel = loader.LoadToVAO(OBJFileLoader.loadOBJ("grassModel.obj"));
-		ModelTexture grassTexture = new ModelTexture(loader.LoadTexture("grassTexture.png"));
-		grassTexture.SetTransparencyBool(true);
-		grassTexture.SetUsingFakeLighting(true);
-		TexturedModel grassTexturedModel = new TexturedModel(grassModel, grassTexture);
-
-		RawModel flowerModel = loader.LoadToVAO(OBJFileLoader.loadOBJ("grassModel.obj"));
-		ModelTexture flowerTexture = new ModelTexture(loader.LoadTexture("flower.png"));
-		flowerTexture.SetTransparencyBool(true);
-		flowerTexture.SetUsingFakeLighting(true);
-		TexturedModel flowerTexturedModel = new TexturedModel(flowerModel, flowerTexture);
 
 		RawModel fernModel = loader.LoadToVAO(OBJFileLoader.loadOBJ("fern.obj"));
 		ModelTexture fernTexture = new ModelTexture(loader.LoadTexture("fern.png"));
 		fernTexture.SetTransparencyBool(true);
+		fernTexture.SetNumberOfRows(2);
 		TexturedModel fernTexturedModel = new TexturedModel(fernModel, fernTexture);
 
-		Player player = new Player(flowerTexturedModel, new Vector3f(0.0f, 0.5f, -20.0f), new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(1.0f, 1.0f, 1.0f));
+		RawModel lampModel = loader.LoadToVAO(OBJFileLoader.loadOBJ("lamp.obj"));
+		ModelTexture lampTexture = new ModelTexture(loader.LoadTexture("lamp.png"));
+		TexturedModel lampTexturedModel = new TexturedModel(lampModel, lampTexture);
 
-		for(int i = 0; i < 1000; i++)
+		//gui instantiations
+		/*
+		List<GuiElement> guis = new ArrayList<GuiElement>();
+		for(int i = 0; i < 16; i++)
 		{
-			entities.add(new Entity(treeTexturedModel, new Vector3f(random.nextFloat() * 80 - 40,0,random.nextFloat() * -80), 1.0f));
+			GuiElement gui = new GuiElement(new GuiTexture(loader.LoadTexture("caveman.png")), i + 1, new Vector2f(0.9f, 0.9f), new Vector2f(0.10f, 0.10f));
+			gui.GetGuiTexture().SetNumberOfRows(4);
+			guis.add(gui);
 		}
+		*/
 
+		GuiRenderer guiRenderer = new GuiRenderer(loader);
+
+		//player instantiation
+		Player player = new Player(treeTexturedModel, new Vector3f(0.0f, 0.5f, -20.0f), new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(1.0f, 1.0f, 1.0f));
+
+		//tree rendering
 		for(int i = 0; i < 600; i++)
 		{
-			entities.add(new Entity(grassTexturedModel, new Vector3f(random.nextFloat() * 80 - 40,0,random.nextFloat() * -80), 0.2f));
-			entities.add(new Entity(fernTexturedModel, new Vector3f(random.nextFloat() * 80 - 40,0,random.nextFloat() * -80), 0.1f));
+			Entity entity = new Entity(treeTexturedModel, new Vector3f(random.nextFloat() * 80 - 40,0,random.nextFloat() * -80), 0.6f * (random.nextFloat() / 4 + 1));
+			for(Terrain terrain:terrains)
+			{
+				if(terrain.InsideThisTerrain(entity.GetPosition().x, entity.GetPosition().z))
+				{
+					entity.SetPosition(new Vector3f(entity.GetPosition().x, terrain.GetHeightOfTerrain(entity.GetPosition().x, entity.GetPosition().z) - 0.5f, entity.GetPosition().z));
+				}
+			}
+			entities.add(entity);
 		}
 
-		for(int i = 0; i < 300; i++)
+		//fern rendering
+		for(int i = 0; i < 4800; i++)
 		{
-			entities.add(new Entity(flowerTexturedModel, new Vector3f(random.nextFloat() * 80 - 40,0,random.nextFloat() * -80), 0.2f));
+			Entity entity = new Entity(fernTexturedModel, random.nextInt(4), new Vector3f(random.nextFloat() * 80 - 40,0,random.nextFloat() * -80), 0.1f);
+			for(Terrain terrain:terrains)
+			{
+				if(terrain.InsideThisTerrain(entity.GetPosition().x, entity.GetPosition().z))
+				{
+					entity.SetPosition(new Vector3f(entity.GetPosition().x, terrain.GetHeightOfTerrain(entity.GetPosition().x, entity.GetPosition().z) - 0.1f, entity.GetPosition().z));
+				}
+			}
+			entities.add(entity);
 		}
+
 
 		//MAIN GAME LOOP
 		while(!glfwWindowShouldClose(MAIN_WINDOW))
@@ -111,11 +141,11 @@ public class MainGameLoop
 			//float cosTime = (float) Math.cos(glfwGetTime());
 			//sun.SetPosition(new Vector3f(2000.0f * sinTime, 2000.0f * cosTime, 2000.0f));
 
-			renderer.Render(sun, player.GetCamera());
-
+			renderer.Render(lights, player.GetCamera());
 			WindowManager.FrameEnd();
 		}
 		//CLEANUP
+		guiRenderer.CleanUp();
 		renderer.CleanUp();
 		loader.CleanUp();
 		WindowManager.Close();

@@ -21,8 +21,7 @@ public class Player extends Entity
         Terrain specifiedTerrain = terrains.get(0);
         for(Terrain terrain:terrains)
         {
-            if(this.GetPosition().x > terrain.GetX() && this.GetPosition().x <= (terrain.GetX() + terrain.GetSize())
-                    && this.GetPosition().z > terrain.GetZ() && this.GetPosition().z <= (terrain.GetZ() + terrain.GetSize()))
+            if(terrain.InsideThisTerrain(camera.GetPosition().x, camera.GetPosition().z))
             {
                 specifiedTerrain = terrain;
             }

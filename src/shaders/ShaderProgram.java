@@ -1,9 +1,6 @@
 package shaders;
 
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
+import org.joml.*;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL11;
@@ -119,6 +116,8 @@ public abstract class ShaderProgram
     {
         GL20.glUniform1f(GetUniformLocation(name), value);
     }
+    public void SetUniform2f(String name, float v1, float v2) { GL20.glUniform2f(GetUniformLocation(name), v1, v2); }
+    public void SetUniform2f(String name, Vector2f vector) { GL20.glUniform2f(GetUniformLocation(name), vector.x, vector.y); }
     public void SetUniform3f(String name, float v1, float v2, float v3) { GL20.glUniform3f(GetUniformLocation(name), v1, v2, v3); }
     public void SetUniform3f(String name, Vector3f vector) { GL20.glUniform3f(GetUniformLocation(name), vector.x, vector.y, vector.z); }
     public void SetUniform4f(String name, float v1, float v2, float v3, float v4) { GL20.glUniform4f(GetUniformLocation(name), v1, v2, v3, v4); }

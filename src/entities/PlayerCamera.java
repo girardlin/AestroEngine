@@ -5,14 +5,13 @@ import terrains.Terrain;
 
 public class PlayerCamera extends Camera
 {
-    private final boolean FREE_CAMERA = false;
+    private final boolean FREE_CAMERA = true;
 
     private static final float CAMERA_MOVE_SPEED = 1.0f;
     private static final float CAMERA_SENSITIVITY = 0.04f;
     private static float GRAVITY = -5.0f;
     private static final float JUMP_POWER = 1.65f;
 
-    private static final float TERRAIN_HEIGHT = 0.0f;
     private static final float CAMERA_HEIGHT = 0.5f;
 
     private float upwardSpeed = 0;
@@ -108,6 +107,9 @@ public class PlayerCamera extends Camera
 
     private void Jump()
     {
-        this.upwardSpeed = JUMP_POWER;
+        if(!FREE_CAMERA)
+        {
+            this.upwardSpeed = JUMP_POWER;
+        }
     }
 }

@@ -35,6 +35,14 @@ public class Loader
 	{
 		return this.LoadToVAO(modelData.GetVertices(), modelData.GetTextureCoords(), modelData.GetNormals(), modelData.GetIndices());
 	}
+
+	public RawModel LoadToVAO(float[] positions)
+	{
+		int vaoID = CreateVAO();
+		StoreDataInAttributeList(0, 2, positions);
+		UnbindVAO();
+		return new RawModel(vaoID, positions.length);
+	}
 	
 	private int CreateVAO()
 	{

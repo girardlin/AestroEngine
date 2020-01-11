@@ -6,10 +6,17 @@ import org.joml.Vector3f;
 
 public class AestroMath
 {
+    public static Matrix4f CreateModelMatrix(Vector2f translation, Vector2f scale)
+    {
+        Matrix4f matrix = new Matrix4f().identity();
+        matrix.translate(new Vector3f(translation, 0.0f));
+        matrix.scale(new Vector3f(scale.x, scale.y, 1.0f));
+        return matrix;
+    }
+
     public static Matrix4f CreateModelMatrix(Vector3f translation, Vector3f rotation, Vector3f scale)
     {
-        Matrix4f matrix = new Matrix4f();
-        matrix.identity();
+        Matrix4f matrix = new Matrix4f().identity();
         matrix.translate(translation);
         matrix.rotate((float) Math.toRadians(rotation.x), 1.0f, 0.0f, 0.0f);
         matrix.rotate((float) Math.toRadians(rotation.y), 0.0f, 1.0f, 0.0f);

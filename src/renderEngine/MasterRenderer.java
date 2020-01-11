@@ -74,16 +74,16 @@ public class MasterRenderer
         projectionMatrix.setPerspective((float)Math.toRadians(fovy), WindowManager.GetScreenAspectRatio(), NEAR_PLANE, FAR_PLANE);
     }
 
-    public void Render(Light sun, Camera camera)
+    public void Render(List<Light> lights, Camera camera)
     {
         //render all processed entities
         entityShader.Bind();
-        entityRenderer.Render(entities, sun, camera, SKY_COLOR);
+        entityRenderer.Render(entities, lights, camera, SKY_COLOR);
         entityShader.Unbind();
 
         //render all terrain
         terrainShader.Bind();
-        terrainRenderer.Render(terrains, sun, camera, SKY_COLOR);
+        terrainRenderer.Render(terrains, lights, camera, SKY_COLOR);
         terrainShader.Unbind();
 
         entities.clear();

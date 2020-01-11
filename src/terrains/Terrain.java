@@ -17,7 +17,7 @@ import java.io.IOException;
 public class Terrain
 {
     private static final float SIZE = 80.0f;
-    private static final float MAX_HEIGHT = 6.0f;
+    private static final float MAX_HEIGHT = 10.0f;
     private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
 
     private float x;
@@ -150,6 +150,11 @@ public class Terrain
                             heights[gridX][gridZ + 1], 1), new Vector2f(xCoord, zCoord));
         }
         return answer;
+    }
+
+    public boolean InsideThisTerrain(float worldX, float worldZ)
+    {
+        return worldX > GetX() && worldX <= (GetX() + GetSize()) && worldZ > GetZ() && worldZ <= (GetZ() + GetSize());
     }
 
     public float GetX() { return x; }

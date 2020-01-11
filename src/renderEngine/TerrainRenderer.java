@@ -27,9 +27,9 @@ public class TerrainRenderer
         this.projectionMatrix = projectionMatrix;
     }
 
-    public void Render(List<Terrain> terrains, Light sun, Camera camera, Vector3f skyColor)
+    public void Render(List<Terrain> terrains, List<Light> lights, Camera camera, Vector3f skyColor)
     {   //uniforms that apply to every entity
-        shader.SetLightUniforms(sun);                           //set lighting uniforms using passed in sun value
+        shader.SetLightUniforms(lights);                           //set lighting uniforms using passed in sun value
         shader.SetUniform3f("u_SkyColor", skyColor);      //fog uniform
 
         //render every processed terrain

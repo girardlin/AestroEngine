@@ -12,10 +12,22 @@ public class Entity
     private Vector3f rotation;
     private Vector3f scale;
 
+    private int textureIndex = 0;
+
     boolean scaledEvenly = true;
 
     public Entity(TexturedModel model, Vector3f position, Vector3f rotation, Vector3f scale)
     {
+        this.model = model;
+        this.position = position;
+        this.rotation = rotation;
+        this.scale = scale;
+        CheckScale();
+    }
+
+    public Entity(TexturedModel model, int index, Vector3f position, Vector3f rotation, Vector3f scale)
+    {
+        this.textureIndex = index;
         this.model = model;
         this.position = position;
         this.rotation = rotation;
@@ -31,6 +43,11 @@ public class Entity
     public Entity(TexturedModel model, Vector3f position, float scale)
     {
         this(model, position, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(scale, scale, scale));
+    }
+
+    public Entity(TexturedModel model, int index, Vector3f position, float scale)
+    {
+        this(model, index, position, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(scale, scale, scale));
     }
 
     public void ChangePosition(float dx, float dy, float dz)
@@ -67,6 +84,18 @@ public class Entity
         {
             scaledEvenly = false;
         }
+    }
+
+    public float GetTextureXOffset()
+    {
+        int row = textureIndex % model.GetTexture().GetNumberOfRows();
+        return (float) row / (float) model.GetTexture().GetNumberOfRows();
+    }
+
+    public float GetTextureYOffset()
+    {
+        int column = textureIndex / model.GetTexture().GetNumberOfRows();
+        return (float) column / (float) model.GetTexture().GetNumberOfRows();
     }
 
     public TexturedModel GetModel() { return model; }
