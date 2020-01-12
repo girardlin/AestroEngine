@@ -1,8 +1,6 @@
 package guis;
 
-import entities.Light;
 import shaders.ShaderProgram;
-import textures.ModelTexture;
 
 public class GuiShader extends ShaderProgram
 {

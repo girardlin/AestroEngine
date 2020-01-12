@@ -19,7 +19,7 @@ public class GuiRenderer
     public GuiRenderer(Loader loader)
     {
         float[] positions = { -1, 1, -1, -1, 1, 1, 1, -1};
-        quad = loader.LoadToVAO(positions);
+        quad = loader.LoadToVAO(positions, 2);
         shader = new GuiShader();
     }
 

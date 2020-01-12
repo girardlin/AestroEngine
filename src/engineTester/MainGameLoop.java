@@ -32,7 +32,7 @@ public class MainGameLoop
 		final long MAIN_WINDOW = WindowManager.Create();
 		InputManager inputManager = new InputManager();
 		Loader loader = new Loader();
-		MasterRenderer renderer = new MasterRenderer();
+		MasterRenderer renderer = new MasterRenderer(loader);
 		Random random = new Random();
 
 		//Lights Instantiations
@@ -44,7 +44,7 @@ public class MainGameLoop
 		//Terrain Instantiations
 		List<Terrain> terrains = new ArrayList<Terrain>();
 
-		TerrainTexture backTexture = new TerrainTexture(loader.LoadTexture("grass2.png"));
+		TerrainTexture backTexture = new TerrainTexture(loader.LoadTexture("grass.png"));
 		TerrainTexture rTexture = new TerrainTexture(loader.LoadTexture("mud.png"));
 		TerrainTexture gTexture = new TerrainTexture(loader.LoadTexture("grassFlowers.png"));
 		TerrainTexture bTexture = new TerrainTexture(loader.LoadTexture("path.png"));
@@ -93,9 +93,9 @@ public class MainGameLoop
 		Player player = new Player(treeTexturedModel, new Vector3f(0.0f, 0.5f, -20.0f), new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(1.0f, 1.0f, 1.0f));
 
 		//tree rendering
-		for(int i = 0; i < 600; i++)
+		for(int i = 0; i < 1200; i++)
 		{
-			Entity entity = new Entity(treeTexturedModel, new Vector3f(random.nextFloat() * 80 - 40,0,random.nextFloat() * -80), 0.6f * (random.nextFloat() / 4 + 1));
+			Entity entity = new Entity(treeTexturedModel, new Vector3f(random.nextFloat() * 160 - 80,0,random.nextFloat() * -80), 0.6f * (random.nextFloat() / 4 + 1));
 			for(Terrain terrain:terrains)
 			{
 				if(terrain.InsideThisTerrain(entity.GetPosition().x, entity.GetPosition().z))
@@ -107,9 +107,9 @@ public class MainGameLoop
 		}
 
 		//fern rendering
-		for(int i = 0; i < 4800; i++)
+		for(int i = 0; i < 9600; i++)
 		{
-			Entity entity = new Entity(fernTexturedModel, random.nextInt(4), new Vector3f(random.nextFloat() * 80 - 40,0,random.nextFloat() * -80), 0.1f);
+			Entity entity = new Entity(fernTexturedModel, random.nextInt(4), new Vector3f(random.nextFloat() * 160 - 80,0,random.nextFloat() * -80), 0.1f);
 			for(Terrain terrain:terrains)
 			{
 				if(terrain.InsideThisTerrain(entity.GetPosition().x, entity.GetPosition().z))

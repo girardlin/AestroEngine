@@ -3,7 +3,6 @@ package renderEngine;
 import entities.Camera;
 import entities.Light;
 import models.RawModel;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
@@ -21,14 +20,17 @@ public class TerrainRenderer
     private TerrainShader shader;
     private Matrix4f projectionMatrix;
 
-    public TerrainRenderer(TerrainShader shader, Matrix4f projectionMatrix)
+    public TerrainRenderer(Matrix4f projectionMatrix)
     {
-        this.shader = shader;
+        shader = new TerrainShader();
         this.projectionMatrix = projectionMatrix;
     }
 
     public void Render(List<Terrain> terrains, List<Light> lights, Camera camera, Vector3f skyColor)
-    {   //uniforms that apply to every entity
+    {
+        shader.Bind();
+
+        //uniforms that apply to every entity
         shader.SetLightUniforms(lights);                           //set lighting uniforms using passed in sun value
         shader.SetUniform3f("u_SkyColor", skyColor);      //fog uniform
 
@@ -39,6 +41,8 @@ public class TerrainRenderer
             GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.GetRawModel().GetVertexCount(), GL11.GL_UNSIGNED_INT, 0);
             UnbindTerrain();
         }
+
+        shader.Unbind();
     }
 
     private void PrepareTerrain(Terrain terrain, Camera camera)
@@ -62,18 +66,10 @@ public class TerrainRenderer
         shader.SetUniform1i("u_bTexture", 3);
         shader.SetUniform1i("u_BlendMap", 4);
 
-        //generate MVP, normal matrix calculation
-        Matrix4f modelMatrix = terrain.GetModelMatrix();
-        Matrix4f viewMatrix = camera.GetViewMatrix();
-        Matrix3f normalMatrix = new Matrix3f();
-        modelMatrix.get3x3(normalMatrix);
-        normalMatrix.invert().transpose();
-
         //uniforms that differ between every instance of an entity
-        shader.SetUniformMat4f("u_ModelMatrix", modelMatrix);               //model matrix uniform
-        shader.SetUniformMat4f("u_ViewMatrix", viewMatrix);                 //view matrix uniform
+        shader.SetUniformMat4f("u_ModelMatrix", terrain.GetModelMatrix());  //model matrix uniform
+        shader.SetUniformMat4f("u_ViewMatrix", camera.GetViewMatrix());     //view matrix uniform
         shader.SetUniformMat4f("u_ProjectionMatrix", projectionMatrix);     //projection matrix uniform
-        shader.SetUniformMat3f("u_NormalMatrix", normalMatrix);             //normal matrix uniform
     }
 
     private void BindTextures(Terrain terrain)
@@ -99,5 +95,10 @@ public class TerrainRenderer
         {
             GL20.glDisableVertexAttribArray(i - 1);
         }
+    }
+
+    public void CleanUp()
+    {
+        shader.CleanUp();
     }
 }

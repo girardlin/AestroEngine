@@ -2,9 +2,9 @@
 
 in vec2 f_TextureCoords;
 
-out vec4 out_Color;
-
 uniform sampler2D u_GuiTexture;
+
+out vec4 out_Color;
 
 void main(void)
 {

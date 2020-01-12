@@ -95,6 +95,8 @@ public abstract class ShaderProgram
         GL20.glDeleteProgram(programID);
     }
 
+    /* ----------------------------------------------------------------------------------------------------------------------------------------------- */
+
     //uniform lookup / set (with caching)
     private Map<String, Integer> uniformLocationCache = new HashMap<String, Integer>();
 

@@ -21,15 +21,18 @@ public class EntityRenderer
 
 	private Matrix4f projectionMatrix;
 
-	public EntityRenderer(StaticShader shader, Matrix4f projectionMatrix)
+	public EntityRenderer(Matrix4f projectionMatrix)
 	{
-		this.shader = shader;
+		shader = new StaticShader();
 		this.projectionMatrix = projectionMatrix;
 	}
 
 	public void Render(Map<TexturedModel, List<Entity>> entities, List<Light> lights, Camera camera, Vector3f skyColor)
-	{	//uniforms that apply to every entity
-		shader.SetLightUniforms(lights);							//set lighting uniforms using passed in sun value
+	{
+		shader.Bind();
+
+		//uniforms that apply to every entity
+		shader.SetLightUniforms(lights);						//set lighting uniforms using passed in sun value
 		shader.SetUniform3f("u_SkyColor", skyColor);		//fog uniform
 
 		//render every processed entity
@@ -44,6 +47,8 @@ public class EntityRenderer
 			}
 			UnbindTexturedModel();
 		}
+
+		shader.Unbind();
 	}
 
 	private void PrepareTexturedModel(TexturedModel model)
@@ -75,9 +80,8 @@ public class EntityRenderer
 
 	private void PrepareInstance(Entity entity, Camera camera)
 	{ 	//sets uniforms, transformations
-		//generate MVP, normal matrix calculation
+		//normal matrix calculation
 		Matrix4f modelMatrix = entity.GetModelMatrix();
-		Matrix4f viewMatrix = camera.GetViewMatrix();
 		Matrix3f normalMatrix = new Matrix3f().identity();
 		if (!entity.IsScaledEvenly())
 		{
@@ -87,10 +91,10 @@ public class EntityRenderer
 
 		//uniforms that differ between every instance of an entity
 		shader.SetUniformMat4f("u_ModelMatrix", modelMatrix);									    //model matrix uniform
-		shader.SetUniformMat4f("u_ViewMatrix", viewMatrix);									    //view matrix uniform
+		shader.SetUniformMat4f("u_ViewMatrix", camera.GetViewMatrix());									    //view matrix uniform
 		shader.SetUniformMat4f("u_ProjectionMatrix", projectionMatrix);						    //projection matrix uniform
 		shader.SetUniformMat3f("u_NormalMatrix", normalMatrix);								    //normal matrix uniform
-		shader.SetUniform2f("u_Offset", entity.GetTextureXOffset(), entity.GetTextureYOffset());   //offset for texture atlas uniform
+		shader.SetUniform2f("u_Offset", entity.GetTextureXOffset(), entity.GetTextureYOffset());  //offset for texture atlas uniform
 	}
 
 	private void UnbindTexturedModel()
@@ -102,5 +106,10 @@ public class EntityRenderer
 		{
 			GL20.glDisableVertexAttribArray(i - 1);
 		}
+	}
+
+	public void CleanUp()
+	{
+		shader.CleanUp();
 	}
 }

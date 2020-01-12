@@ -9,8 +9,7 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
-import shaders.StaticShader;
-import shaders.TerrainShader;
+import skybox.SkyboxRenderer;
 import terrains.Terrain;
 
 import java.util.ArrayList;
@@ -26,9 +25,9 @@ public class MasterRenderer
     private static float currentFrame;
 
     //sky color
-    private static final float RED = 0.8f;
-    private static final float GREEN = 0.8f;
-    private static final float BLUE = 0.8f;
+    private static final float RED = 0.5444f;
+    private static final float GREEN = 0.62f;
+    private static final float BLUE = 0.69f;
     private static final Vector3f SKY_COLOR = new Vector3f(RED, GREEN, BLUE);
 
     //projection matrix creation variables
@@ -38,23 +37,28 @@ public class MasterRenderer
     Matrix4f projectionMatrix = new Matrix4f();
 
     //specific renderers
-    private StaticShader entityShader = new StaticShader();
-    private EntityRenderer entityRenderer = new EntityRenderer(entityShader, GetProjectionMatrix());
+    private EntityRenderer entityRenderer;
 
-    private TerrainShader terrainShader = new TerrainShader();
-    private TerrainRenderer terrainRenderer = new TerrainRenderer(terrainShader, GetProjectionMatrix());
+    private TerrainRenderer terrainRenderer;
+
+    private SkyboxRenderer skyboxRenderer;
 
     private Map<TexturedModel, List<Entity>> entities = new HashMap<TexturedModel, List<Entity>>();
     private List<Terrain> terrains = new ArrayList<Terrain>();
 
-    public MasterRenderer()
+    public MasterRenderer(Loader loader)
     {
         //culling optimization and z-depth testing
         GL.createCapabilities();
         EnableCulling();
         GL11.glEnable(GL11.GL_DEPTH_TEST);
 
+        //projection matrix calculation / creation
         projectionMatrix.setPerspective((float)Math.toRadians(fovy), WindowManager.GetScreenAspectRatio(), NEAR_PLANE, FAR_PLANE);
+
+        entityRenderer = new EntityRenderer(GetProjectionMatrix());
+        terrainRenderer = new TerrainRenderer(GetProjectionMatrix());
+        skyboxRenderer = new SkyboxRenderer(loader, GetProjectionMatrix());
     }
 
     public void FrameBegin()
@@ -77,14 +81,13 @@ public class MasterRenderer
     public void Render(List<Light> lights, Camera camera)
     {
         //render all processed entities
-        entityShader.Bind();
         entityRenderer.Render(entities, lights, camera, SKY_COLOR);
-        entityShader.Unbind();
 
         //render all terrain
-        terrainShader.Bind();
         terrainRenderer.Render(terrains, lights, camera, SKY_COLOR);
-        terrainShader.Unbind();
+
+        //render skybox
+        skyboxRenderer.Render(camera);
 
         entities.clear();
         terrains.clear();
@@ -123,16 +126,6 @@ public class MasterRenderer
         GL11.glDisable(GL11.GL_CULL_FACE);
     }
 
-    public Matrix4f GetProjectionMatrix()
-    {
-       return projectionMatrix;
-    }
-
-    public float GetDeltaTime()
-    {
-        return deltaTime;
-    }
-
     public void IncreaseFOVY(float amount)
     {
         fovy += amount * 32.5f;
@@ -145,9 +138,19 @@ public class MasterRenderer
         if (fovy < 90.0f) { fovy = 90.0f; }
     }
 
+    public Matrix4f GetProjectionMatrix()
+    {
+        return projectionMatrix;
+    }
+    public float GetDeltaTime()
+    {
+        return deltaTime;
+    }
+
     public void CleanUp()
     {
-        entityShader.CleanUp();
-        terrainShader.CleanUp();
+        entityRenderer.CleanUp();
+        terrainRenderer.CleanUp();
+        skyboxRenderer.CleanUp();
     }
 }

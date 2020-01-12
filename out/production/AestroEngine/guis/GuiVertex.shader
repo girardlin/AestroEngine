@@ -2,12 +2,12 @@
 
 in vec2 v_Position;
 
-out vec2 f_TextureCoords;
-
 uniform mat4 u_ModelMatrix;
 
 uniform float u_NumberOfRows;
 uniform vec2 u_Offset;
+
+out vec2 f_TextureCoords;
 
 void main(void)
 {

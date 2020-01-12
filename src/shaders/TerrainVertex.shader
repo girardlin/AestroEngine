@@ -7,7 +7,6 @@ in vec3 v_Normal;
 uniform mat4 u_ModelMatrix;
 uniform mat4 u_ViewMatrix;
 uniform mat4 u_ProjectionMatrix;
-uniform mat3 u_NormalMatrix;
 
 uniform vec3 u_LightPosition[4];
 
@@ -34,7 +33,7 @@ void main(void)
     }
 
     f_TextureCoords = v_TextureCoords;
-    f_SurfaceNormal = u_NormalMatrix * v_Normal;
+    f_SurfaceNormal = v_Normal;
     f_ToCameraVector = normalize((inverse(u_ViewMatrix) * vec4(0.0f, 0.0f, 0.0f, 1.0f)).xyz - worldPosition.xyz);
 
     //visibility modifier for fog in fragment shader

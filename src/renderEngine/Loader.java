@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import textures.CubeMap;
 import textures.Texture;
 
 public class Loader
@@ -36,12 +37,12 @@ public class Loader
 		return this.LoadToVAO(modelData.GetVertices(), modelData.GetTextureCoords(), modelData.GetNormals(), modelData.GetIndices());
 	}
 
-	public RawModel LoadToVAO(float[] positions)
+	public RawModel LoadToVAO(float[] positions, int dimensions)
 	{
 		int vaoID = CreateVAO();
-		StoreDataInAttributeList(0, 2, positions);
+		StoreDataInAttributeList(0, dimensions, positions);
 		UnbindVAO();
-		return new RawModel(vaoID, positions.length);
+		return new RawModel(vaoID, positions.length / dimensions);
 	}
 	
 	private int CreateVAO()
@@ -66,9 +67,14 @@ public class Loader
 	{
 		Texture texture = new Texture(fileName);
 		textureList.add(texture.GetTextureID());
-		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
 		return texture.GetTextureID();
+	}
+
+	public int LoadCubeMap(String[] fileNames)
+	{
+		CubeMap cubeMap = new CubeMap(fileNames);
+		textureList.add(cubeMap.GetTextureID());
+		return cubeMap.GetTextureID();
 	}
 
 	private void StoreDataInAttributeList(int attributeNumber, int coordinateSize, float[] data)
