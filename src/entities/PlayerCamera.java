@@ -5,7 +5,7 @@ import terrains.Terrain;
 
 public class PlayerCamera extends Camera
 {
-    private final boolean FREE_CAMERA = true;
+    private final boolean FREE_CAMERA = false;
 
     private static final float CAMERA_MOVE_SPEED = 1.0f;
     private static final float CAMERA_SENSITIVITY = 0.04f;

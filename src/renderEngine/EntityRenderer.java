@@ -27,13 +27,13 @@ public class EntityRenderer
 		this.projectionMatrix = projectionMatrix;
 	}
 
-	public void Render(Map<TexturedModel, List<Entity>> entities, List<Light> lights, Camera camera, Vector3f skyColor)
+	public void Render(Map<TexturedModel, List<Entity>> entities, List<Light> lights, Camera camera, Vector3f fogColor)
 	{
 		shader.Bind();
 
 		//uniforms that apply to every entity
 		shader.SetLightUniforms(lights);						//set lighting uniforms using passed in sun value
-		shader.SetUniform3f("u_SkyColor", skyColor);		//fog uniform
+		shader.SetUniform3f("u_SkyColor", fogColor);		//fog uniform
 
 		//render every processed entity
 		for(TexturedModel model:entities.keySet())

@@ -56,8 +56,8 @@ public class MasterRenderer
         //projection matrix calculation / creation
         projectionMatrix.setPerspective((float)Math.toRadians(fovy), WindowManager.GetScreenAspectRatio(), NEAR_PLANE, FAR_PLANE);
 
-        entityRenderer = new EntityRenderer(GetProjectionMatrix());
-        terrainRenderer = new TerrainRenderer(GetProjectionMatrix());
+        entityRenderer = new EntityRenderer(projectionMatrix);
+        terrainRenderer = new TerrainRenderer(projectionMatrix);
         skyboxRenderer = new SkyboxRenderer(loader, GetProjectionMatrix());
     }
 
@@ -87,7 +87,7 @@ public class MasterRenderer
         terrainRenderer.Render(terrains, lights, camera, SKY_COLOR);
 
         //render skybox
-        skyboxRenderer.Render(camera);
+        skyboxRenderer.Render(camera, SKY_COLOR, deltaTime);
 
         entities.clear();
         terrains.clear();
