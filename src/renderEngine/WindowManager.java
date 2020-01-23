@@ -14,6 +14,11 @@ public class WindowManager
 	private static final int SCREEN_HEIGHT = 600;
 	
 	private static long window;
+
+	//delta time variables
+	private static float deltaTime = 0.0f;
+	private static float lastFrame = 0.0f;
+	private static float currentFrame;
 	
 	public static long Create()
 	{
@@ -37,7 +42,8 @@ public class WindowManager
 		glfwMakeContextCurrent(window);
 		glfwSwapInterval(1);
 		glfwShowWindow(window);
-		
+
+		//LWJGL integration
 		GL.createCapabilities();
 		
 		return window;
@@ -45,6 +51,11 @@ public class WindowManager
 	
 	public static void FrameEnd() //update function
 	{
+		//delta time calculations
+		currentFrame = (float) GLFW.glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -62,4 +73,5 @@ public class WindowManager
 	public static int GetScreenWidth() { return SCREEN_WIDTH; }
 	public static int GetScreenHeight() { return SCREEN_HEIGHT; }
 	public static float GetScreenAspectRatio() { return (float)(SCREEN_WIDTH / SCREEN_HEIGHT); }
+	public static float GetDeltaTime() { return deltaTime; }
 }

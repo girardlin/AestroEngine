@@ -20,6 +20,26 @@ public class Camera
     }
     public Camera() { }
 
+    public void ChangePositionX(float amount)
+    {
+        this.position.x += amount;
+    }
+
+    public void ChangePositionY(float amount)
+    {
+        this.position.y += amount;
+    }
+
+    public void ChangePositionZ(float amount)
+    {
+        this.position.z += amount;
+    }
+
+    public void ChangePosition(Vector3f amount)
+    {
+        this.position.add(amount);
+    }
+
     public Vector3f GetPosition() { return position; }
     public float GetPitch() { return pitch; }
     public float GetYaw() { return yaw; }
@@ -32,6 +52,16 @@ public class Camera
 
     public Matrix4f GetViewMatrix()
     {
+        if (pitch > 89.0f)
+            pitch = 89.0f;
+        if (pitch < -89.0f)
+            pitch = -89.0f;
+
+        front.x = (float) (Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));
+        front.y = (float) (Math.sin(Math.toRadians(pitch)));
+        front.z = (float) (Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));
+        front.normalize();
+
         return new Matrix4f().lookAt(position, new Vector3f(front).add(position), up);
     }
 }

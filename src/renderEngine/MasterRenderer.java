@@ -3,10 +3,11 @@ package renderEngine;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
+import entities.Player;
 import models.TexturedModel;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFW;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import skybox.SkyboxRenderer;
@@ -19,11 +20,6 @@ import java.util.Map;
 
 public class MasterRenderer
 {
-    //delta time variables
-    private static float deltaTime = 0.0f;
-    private static float lastFrame = 0.0f;
-    private static float currentFrame;
-
     //sky color
     private static final float RED = 0.5444f;
     private static final float GREEN = 0.62f;
@@ -38,9 +34,7 @@ public class MasterRenderer
 
     //specific renderers
     private EntityRenderer entityRenderer;
-
     private TerrainRenderer terrainRenderer;
-
     private SkyboxRenderer skyboxRenderer;
 
     private Map<TexturedModel, List<Entity>> entities = new HashMap<TexturedModel, List<Entity>>();
@@ -61,6 +55,23 @@ public class MasterRenderer
         skyboxRenderer = new SkyboxRenderer(loader, GetProjectionMatrix());
     }
 
+    public void RenderScene(List<Terrain> terrains, List<Entity> entities, List<Light> lights, Player player, Vector4f clipPlane)
+    {
+        FrameBegin();
+
+        //terrain and entity list processing
+        for(Terrain terrain:terrains)
+        {
+            ProcessTerrain(terrain);
+        }
+        for(Entity entity:entities)
+        {
+            ProcessEntity(entity);
+        }
+
+        Render(lights, player.GetCamera(), clipPlane);
+    }
+
     public void FrameBegin()
     {
         //wireframe
@@ -69,25 +80,20 @@ public class MasterRenderer
         GL11.glClearColor(RED, GREEN, BLUE, 1.0f);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
-        //delta time calculations
-        currentFrame = (float) GLFW.glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
         //set projection matrix
         projectionMatrix.setPerspective((float)Math.toRadians(fovy), WindowManager.GetScreenAspectRatio(), NEAR_PLANE, FAR_PLANE);
     }
 
-    public void Render(List<Light> lights, Camera camera)
+    public void Render(List<Light> lights, Camera camera, Vector4f clipPlane)
     {
         //render all processed entities
-        entityRenderer.Render(entities, lights, camera, SKY_COLOR);
+        entityRenderer.Render(entities, lights, camera, SKY_COLOR, clipPlane);
 
         //render all terrain
-        terrainRenderer.Render(terrains, lights, camera, SKY_COLOR);
+        terrainRenderer.Render(terrains, lights, camera, SKY_COLOR, clipPlane);
 
         //render skybox
-        skyboxRenderer.Render(camera, SKY_COLOR, deltaTime);
+        skyboxRenderer.Render(camera, SKY_COLOR, WindowManager.GetDeltaTime());
 
         entities.clear();
         terrains.clear();
@@ -141,10 +147,6 @@ public class MasterRenderer
     public Matrix4f GetProjectionMatrix()
     {
         return projectionMatrix;
-    }
-    public float GetDeltaTime()
-    {
-        return deltaTime;
     }
 
     public void CleanUp()

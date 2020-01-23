@@ -1,13 +1,12 @@
 package entities;
 
 import org.joml.Vector3f;
-import terrains.Terrain;
 
 public class PlayerCamera extends Camera
 {
-    private final boolean FREE_CAMERA = false;
+    private final boolean FREE_CAMERA = true;
 
-    private static final float CAMERA_MOVE_SPEED = 1.0f;
+    private static final float CAMERA_MOVE_SPEED = 10.0f;
     private static final float CAMERA_SENSITIVITY = 0.04f;
     private static float GRAVITY = -5.0f;
     private static final float JUMP_POWER = 1.65f;
@@ -75,16 +74,6 @@ public class PlayerCamera extends Camera
 
         yaw += this.offsetX;
         pitch -= this.offsetY;
-
-        if (pitch > 89.0f)
-            pitch = 89.0f;
-        if (pitch < -89.0f)
-            pitch = -89.0f;
-
-        front.x = (float) (Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));
-        front.y = (float) (Math.sin(Math.toRadians(pitch)));
-        front.z = (float) (Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));
-        front.normalize();
     }
 
     public void UpdateData(float deltaTime, float terrainHeight)
@@ -111,5 +100,10 @@ public class PlayerCamera extends Camera
         {
             this.upwardSpeed = JUMP_POWER;
         }
+    }
+
+    public void InvertPitch()
+    {
+        this.pitch = -this.pitch;
     }
 }

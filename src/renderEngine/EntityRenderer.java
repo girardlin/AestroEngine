@@ -8,6 +8,7 @@ import models.TexturedModel;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.*;
 import shaders.StaticShader;
 import textures.ModelTexture;
@@ -19,21 +20,25 @@ public class EntityRenderer
 {
 	private StaticShader shader;
 
-	private Matrix4f projectionMatrix;
-
 	public EntityRenderer(Matrix4f projectionMatrix)
 	{
 		shader = new StaticShader();
-		this.projectionMatrix = projectionMatrix;
+
+		//projection matrix uniform - will remain consistent, so we can just set it here, same with texture unit
+		shader.Bind();
+		shader.SetUniformMat4f("u_ProjectionMatrix", projectionMatrix);
+		shader.SetUniform1i("u_TextureSampler", 0);
+		shader.Unbind();
 	}
 
-	public void Render(Map<TexturedModel, List<Entity>> entities, List<Light> lights, Camera camera, Vector3f fogColor)
+	public void Render(Map<TexturedModel, List<Entity>> entities, List<Light> lights, Camera camera, Vector3f fogColor, Vector4f clipPlane)
 	{
 		shader.Bind();
 
 		//uniforms that apply to every entity
 		shader.SetLightUniforms(lights);						//set lighting uniforms using passed in sun value
 		shader.SetUniform3f("u_SkyColor", fogColor);		//fog uniform
+		shader.SetUniform4f("u_ClipPlane", clipPlane);	//clipping plane uniform
 
 		//render every processed entity
 		for(TexturedModel model:entities.keySet())
@@ -74,7 +79,6 @@ public class EntityRenderer
 		//uniforms that apply to every model
 		shader.SetShineUniforms(texture); 													//shininess and reflectivity uniforms
 		shader.SetUniform1b("u_UseFakeLighting", texture.IsUsingFakeLighting());		//fake lighting uniform
-		shader.SetUniform1i("u_TextureSampler", 0);							//texture sampler uniform set to corresponding unit
 		shader.SetUniform1f("u_NumberOfRows", model.GetTexture().GetNumberOfRows());	//number of rows for texture atlas uniform
 	}
 
@@ -91,8 +95,7 @@ public class EntityRenderer
 
 		//uniforms that differ between every instance of an entity
 		shader.SetUniformMat4f("u_ModelMatrix", modelMatrix);									    //model matrix uniform
-		shader.SetUniformMat4f("u_ViewMatrix", camera.GetViewMatrix());									    //view matrix uniform
-		shader.SetUniformMat4f("u_ProjectionMatrix", projectionMatrix);						    //projection matrix uniform
+		shader.SetUniformMat4f("u_ViewMatrix", camera.GetViewMatrix());							//view matrix uniform
 		shader.SetUniformMat3f("u_NormalMatrix", normalMatrix);								    //normal matrix uniform
 		shader.SetUniform2f("u_Offset", entity.GetTextureXOffset(), entity.GetTextureYOffset());  //offset for texture atlas uniform
 	}

@@ -15,6 +15,8 @@ uniform vec3 u_LightPosition[4];
 uniform float u_NumberOfRows;
 uniform vec2 u_Offset;
 
+uniform vec4 u_ClipPlane;
+
 const float density = 0.08f;
 const float gradient = 1.25f;
 
@@ -30,6 +32,9 @@ void main(void)
     vec4 worldPosition =  u_ModelMatrix * vec4(v_Position, 1.0f);
     vec4 positionRelativeToCam = u_ViewMatrix * worldPosition;
     gl_Position = u_ProjectionMatrix * positionRelativeToCam;
+
+    //clip horizontal
+    gl_ClipDistance[0] = dot(worldPosition, u_ClipPlane);
 
     //use fake lighting check
     vec3 finalNormal = v_Normal;

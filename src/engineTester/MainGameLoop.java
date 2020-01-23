@@ -14,11 +14,17 @@ import models.TexturedModel;
 import objConverter.OBJFileLoader;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 import renderEngine.*;
 import terrains.Terrain;
 import textures.ModelTexture;
 import textures.TerrainTexture;
 import textures.TerrainTexturePack;
+import water.WaterFrameBuffers;
+import water.WaterRenderer;
+import water.WaterTile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +44,7 @@ public class MainGameLoop
 		//Lights Instantiations
 		List<Light> lights = new ArrayList<Light>();
 
-		Light sun = new Light(new Vector3f(200.0f, 200.0f, 200.0f), new Vector3f(0.8f, 0.8f, 0.8f));
+		Light sun = new Light(new Vector3f(200.0f), new Vector3f(0.9f));
 		lights.add(sun);
 
 		//Terrain Texture Loading
@@ -102,14 +108,26 @@ public class MainGameLoop
 			entities.add(entity);
 		}
 
-		//player instantiation
-		Player player = new Player(treeTexturedModel, new Vector3f(0.0f, 0.5f, -20.0f), new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(1.0f, 1.0f, 1.0f));
+		//water instantiation
+		List<WaterTile> waters = new ArrayList<WaterTile>();
+		waters.add(new WaterTile(-40.0f, -40.0f, -0.5f));
+		waters.add(new WaterTile(40.0f, -40.0f, -0.5f));
 
-		//gui instantiations
-		//none for now
+		WaterFrameBuffers fbos = new WaterFrameBuffers();
+
+		//player instantiation
+		Player player = new Player(treeTexturedModel, new Vector3f(0.0f, 0.5f, -20.0f), new Vector3f(0.0f), new Vector3f(1.0f));
+
+		//gui element instantiations
+		//GuiTexture healthbar = new GuiTexture(loader.LoadTexture("healthbar.png"));
+		//GuiElement guiElement = new GuiElement(healthbar, new Vector2f( 0.8f, 0.95f), new Vector2f(0.2f, 0.05f));
+
+		List<GuiElement> guis = new ArrayList<GuiElement>();
+		//guis.add(guiElement);
 
 		//Main Managers
 		MasterRenderer renderer = new MasterRenderer(loader);
+		WaterRenderer waterRenderer = new WaterRenderer(loader, renderer.GetProjectionMatrix(), fbos);
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 		InputManager inputManager = new InputManager(player.GetCamera(), renderer);
 
@@ -118,27 +136,36 @@ public class MainGameLoop
 		//MAIN GAME LOOP
 		while(!glfwWindowShouldClose(MAIN_WINDOW))
 		{
-			renderer.FrameBegin();
+			inputManager.ProcessInputs(WindowManager.GetDeltaTime());
+			player.UpdatePosition(WindowManager.GetDeltaTime(), terrains);
 
-			inputManager.ProcessInputs(renderer.GetDeltaTime());
-			player.UpdatePosition(renderer.GetDeltaTime(), terrains);
+			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 
-			//terrain and entity list processing
-			for(Terrain terrain:terrains)
-			{
-				renderer.ProcessTerrain(terrain);
-			}
-			for(Entity entity:entities)
-			{
-				renderer.ProcessEntity(entity);
-			}
+			//render scene to reflection framebuffer and set clip plane to above water height, do reflection calculations to give illusion
+			fbos.BindReflectionFrameBuffer();
+			float distance = 2 * (player.GetCamera().GetPosition().y - waters.get(0).GetHeight());
+			player.GetCamera().ChangePositionY(-distance);
+			player.GetCamera().InvertPitch();
+			renderer.RenderScene(terrains, entities, lights, player, new Vector4f(0,1,0, -waters.get(0).GetHeight()));
+			player.GetCamera().InvertPitch();
+			player.GetCamera().ChangePositionY(distance);
 
-			renderer.Render(lights, player.GetCamera());
+			//render scene to refraction framebuffer and set clip plane to above water height
+			fbos.BindRefractionFrameBuffer();
+			renderer.RenderScene(terrains, entities, lights, player, new Vector4f(0,-1,0, waters.get(0).GetHeight()));
+
+			GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
+			fbos.UnbindFrameBuffer();
+			renderer.RenderScene(terrains, entities, lights, player, new Vector4f(0,-1,0,10000));
+			waterRenderer.Render(waters, player.GetCamera());
+			guiRenderer.Render(guis);
 
 			WindowManager.FrameEnd();
 		}
 		//CLEANUP
 		guiRenderer.CleanUp();
+		waterRenderer.CleanUp();
+		fbos.CleanUp();
 		renderer.CleanUp();
 		loader.CleanUp();
 		WindowManager.Close();

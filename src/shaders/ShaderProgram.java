@@ -123,7 +123,7 @@ public abstract class ShaderProgram
     public void SetUniform3f(String name, float v1, float v2, float v3) { GL20.glUniform3f(GetUniformLocation(name), v1, v2, v3); }
     public void SetUniform3f(String name, Vector3f vector) { GL20.glUniform3f(GetUniformLocation(name), vector.x, vector.y, vector.z); }
     public void SetUniform4f(String name, float v1, float v2, float v3, float v4) { GL20.glUniform4f(GetUniformLocation(name), v1, v2, v3, v4); }
-    public void SetUniform4f(String name, Vector4f vector) { GL20.glUniform4f(GetUniformLocation(name), vector.w, vector.x, vector.y, vector.z); }
+    public void SetUniform4f(String name, Vector4f vector) { GL20.glUniform4f(GetUniformLocation(name), vector.x, vector.y, vector.z, vector.w); }
     public void SetUniformMat3f(String name, Matrix3f matrix)
     {
         matrix.get(matrix3fBuffer);

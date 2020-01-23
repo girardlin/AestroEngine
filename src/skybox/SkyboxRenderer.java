@@ -24,15 +24,18 @@ public class SkyboxRenderer
     private int textureID;
     private SkyboxShader shader;
 
-    private Matrix4f projectionMatrix;
-
     public SkyboxRenderer(Loader loader, Matrix4f projectionMatrix)
     {
         cube = loader.LoadToVAO(VERTICES, 3);
         textureID = loader.LoadCubeMap(TEXTURE_FILENAMES);
 
         shader = new SkyboxShader();
-        this.projectionMatrix = projectionMatrix;
+
+        //projection matrix uniform - will remain consistent, so we can just set it here, same with texture units
+        shader.Bind();
+        shader.SetUniformMat4f("u_ProjectionMatrix", projectionMatrix);
+        shader.SetUniform1i("u_CubeMap", 0);
+        shader.Unbind();
     }
 
     public void Render(Camera camera, Vector3f fogColor, float deltaTime)
@@ -55,9 +58,7 @@ public class SkyboxRenderer
         modifiedViewMatrix.m32(0.0f);
         modifiedViewMatrix.rotate((float)Math.toRadians(rotation), 0.0f, 1.0f, 0.0f);
 
-
         shader.SetUniformMat4f("u_ViewMatrix", modifiedViewMatrix);
-        shader.SetUniformMat4f("u_ProjectionMatrix", projectionMatrix);
         shader.SetUniform3f("u_FogColor", fogColor);
 
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, cube.GetVertexCount());

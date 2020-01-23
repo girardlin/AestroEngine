@@ -25,19 +25,6 @@ public class AestroMath
         return matrix;
     }
 
-    /*
-    public static Matrix4f CreateThinsViewMatrix(float pitch, float yaw, Vector3f position)
-    {
-        Matrix4f matrix = new Matrix4f();
-        matrix.identity();
-        matrix.rotate((float) Math.toRadians(pitch), 1.0f, 0.0f, 0.0f);
-        matrix.rotate((float) Math.toRadians(yaw), 0.0f, 1.0f, 0.0f);
-        Vector3f negativeCameraPos = new Vector3f(-position.x, -position.y, -position.z);
-        matrix.translate(negativeCameraPos);
-        return matrix;
-    }
-    */
-
     public static float BarryCentric(Vector3f p1, Vector3f p2, Vector3f p3, Vector2f pos)
     {
         float det = (p2.z - p3.z) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.z - p3.z);

@@ -79,6 +79,7 @@ public class GuiRenderer
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, gui.GetGuiTexture().GetTextureID());
 
         Matrix4f matrix = AestroMath.CreateModelMatrix(gui.GetPosition(), gui.GetScale());
+
         shader.SetUniformMat4f("u_ModelMatrix", matrix);
         shader.SetUniform1f("u_NumberOfRows", gui.GetGuiTexture().GetNumberOfRows());
         shader.SetUniform2f("u_Offset", gui.GetTextureXOffset(), gui.GetTextureYOffset());
